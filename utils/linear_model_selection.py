@@ -104,6 +104,9 @@ def getBestKModel(X_train, y_train, X_test, y_test, k: int, regressor = 'OLS'):
             results.append(processSubsetOLS(combo, X_train, y_train, X_test, y_test))
         elif regressor == 'RidgeLasso':
             results.append(processSubsetRidgeLasso(combo, X_train, y_train, X_test, y_test))
+        elif regressor == 'any':
+            results.append(processSubsetOLS(combo, X_train, y_train, X_test, y_test))
+            results.append(processSubsetRidgeLasso(combo, X_train, y_train, X_test, y_test))
         
     models = pd.DataFrame(results)
     
@@ -126,6 +129,9 @@ def forwardSelection(X_train, y_train, X_test, y_test, predictors, regressor = '
             results.append(processSubsetOLS(subset, X_train, y_train, X_test, y_test))
         elif regressor == 'RidgeLasso':
             results.append(processSubsetRidgeLasso(subset, X_train, y_train, X_test, y_test))
+        elif regressor == 'any':
+            results.append(processSubsetOLS(combo, X_train, y_train, X_test, y_test))
+            results.append(processSubsetRidgeLasso(combo, X_train, y_train, X_test, y_test))            
 
     models = pd.DataFrame(results)
 
@@ -143,6 +149,9 @@ def backwardSelection(X_train, y_train, X_test, y_test, predictors, regressor = 
         if regressor == 'OLS':
             results.append(processSubsetOLS(combo, X_train, y_train, X_test, y_test))
         elif regressor == 'RidgeLasso':
+            results.append(processSubsetRidgeLasso(combo, X_train, y_train, X_test, y_test))
+        elif regressor == 'any':
+            results.append(processSubsetOLS(combo, X_train, y_train, X_test, y_test))
             results.append(processSubsetRidgeLasso(combo, X_train, y_train, X_test, y_test))
 
     models = pd.DataFrame(results)
