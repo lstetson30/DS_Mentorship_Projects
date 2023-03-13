@@ -1,0 +1,15 @@
+model,params,train_score_cv_mse,test_score_mse
+ols_regression,"{'intercept': 29.231649835711803, 'parameters': array(['cement', 'slag', 'flyash', 'water', 'age'], dtype=object), 'coefficients': array([ 0.1131505 ,  0.09724248,  0.08659487, -0.23522754,  0.12612054])}",104.60348241576628,135.34941606365965
+
+ridge_regression,"{'intercept': 28.73084095328784, 'parameters': ['cement', 'slag', 'flyash', 'water', 'age'], 'coefficients': array([ 0.11311824,  0.09706602,  0.08659104, -0.23223695,  0.12567094])}",104.59727451643423,135.42993071582026
+
+decision_tree,"{'ccp_alpha': 0.0, 'criterion': 'squared_error', 'max_depth': 20, 'max_features': None, 'max_leaf_nodes': None, 'min_impurity_decrease': 0.0, 'min_samples_leaf': 1, 'min_samples_split': 2, 'min_weight_fraction_leaf': 0.0, 'random_state': 0, 'splitter': 'best'}",43.32238836973393,45.85633155339805
+
+random_forest,"{'bootstrap': True, 'ccp_alpha': 0.0, 'criterion': 'squared_error', 'max_depth': 20, 'max_features': 4, 'max_leaf_nodes': None, 'max_samples': None, 'min_impurity_decrease': 0.0, 'min_samples_leaf': 1, 'min_samples_split': 2, 'min_weight_fraction_leaf': 0.0, 'n_estimators': 500, 'n_jobs': None, 'oob_score': True, 'random_state': 0, 'verbose': 0, 'warm_start': False}",27.351751354773455,27.255496361774966
+
+gradient_boosted_tree,"{'alpha': 0.9, 'ccp_alpha': 0.0, 'criterion': 'friedman_mse', 'init': None, 'learning_rate': 0.05, 'loss': 'squared_error', 'max_depth': 4, 'max_features': 'sqrt', 'max_leaf_nodes': None, 'min_impurity_decrease': 0.0, 'min_samples_leaf': 1, 'min_samples_split': 10, 'min_weight_fraction_leaf': 0.0, 'n_estimators': 1000, 'n_iter_no_change': None, 'random_state': 0, 'subsample': 1.0, 'tol': 0.0001, 'validation_fraction': 0.1, 'verbose': 0, 'warm_start': False}",19.844802836697458,18.35883378090265
+
+light_gradient_boosted_tree,"{'boosting_type': 'gbdt', 'class_weight': None, 'colsample_bytree': 1.0, 'importance_type': 'split', 'learning_rate': 0.1, 'max_depth': 8, 'min_child_samples': 16, 'min_child_weight': 0.001, 'min_split_gain': 0.0, 'n_estimators': 250, 'n_jobs': -1, 'num_leaves': 31, 'objective': None, 'random_state': 0, 'reg_alpha': 0.0, 'reg_lambda': 0.0, 'silent': 'warn', 'subsample': 0.8, 'subsample_for_bin': 200000, 'subsample_freq': 0}",21.81584872485221,21.86678030704885
+
+bayesian_additive_regression_tree,"{'alpha': 0.95, 'beta': 2.0, 'initializer': None, 'n_burn': 200, 'n_chains': 1, 'n_jobs': -1, 'n_samples': 1000, 'n_trees': 200, 'sigma_a': 0.001, 'sigma_b': 0.001, 'store_acceptance_trace': False, 'store_in_sample_predictions': True, 'thin': 1, 'tree_sampler': <bartpy.samplers.unconstrainedtree.treemutation.UnconstrainedTreeMutationSampler object at 0x000002A2AFC7AD10>}",35.333413284590804,34.9017517678221
+
