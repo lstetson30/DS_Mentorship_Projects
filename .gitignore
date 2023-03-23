@@ -138,11 +138,14 @@ dmypy.json
 cython_debug/
 
 # Test
-raw_data/*
-models/*
-results/*
+raw_data/
+models/
+results/
 
 # Test exemptions
 !raw_data/.gitkeep
 !models/.gitkeep
 !results/.gitkeep
+
+# Reference files
+Projects/Concrete_Strength_Regression/Scripts/framework.txt
