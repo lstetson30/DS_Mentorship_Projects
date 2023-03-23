@@ -17,14 +17,16 @@ def readData(filename: str):
     print(frame.head())
     return frame
 
-def printSummaryStats(df: pd.DataFrame, columns: list):
+def printSummaryStats(df: pd.DataFrame, columns: list = None):
     """Prints the summary statistics of the columns of the dataframe
 
     Args:
         df (pd.DataFrame): Dataframe containing the data
-        columns (list): List of columns for which the summary statistics are to be printed
+        columns (list, optional): List of columns for which the summary statistics are to be printed. Defaults to None.
     """
     print("Summary Statistics:")
+    if columns is None:
+        columns = df.columns
     print(df[columns].describe())
 
 def saveToRawData(df: pd.DataFrame, filename: str = None):
@@ -36,5 +38,6 @@ def saveToRawData(df: pd.DataFrame, filename: str = None):
     """
     name = filename if filename is not None else 'raw_data'
     ts = datetime.now().strftime('%Y%m%d_%H%M%S')
-    df.to_csv(f"./Projects/Concrete_Strength_Regression/data/raw_data/{name}_{ts}.csv", index=False)
-    print(f"Data saved to ./Projects/Concrete_Strength_Regression/data/raw_data/{name}_{ts}.csv")
+    save_path = f"../data/raw_data/{name}_{ts}.csv"
+    df.to_csv(save_path, index=False)
+    print(f"Data saved to {save_path}")

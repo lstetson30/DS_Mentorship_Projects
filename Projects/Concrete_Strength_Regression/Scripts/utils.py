@@ -16,6 +16,7 @@ def printShape(func):
         if type(df) is not pd.DataFrame:
             for output in df:
                 print(output.shape, end=' ')
+            print()
         else:
             print(df.shape)
         return df

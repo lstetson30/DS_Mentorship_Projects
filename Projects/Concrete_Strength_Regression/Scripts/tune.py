@@ -1,10 +1,11 @@
 import pandas as pd
-import numpy as np
 from constants import parameters
 from utils import timeit
-import argparse
+import joblib
+import os.path
 
 from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import mean_squared_error
 from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
@@ -13,15 +14,15 @@ from bartpy.sklearnmodel import SklearnModel
 
 N_JOBS = -1
 
-class Tune(object):
+class TuneTrain(object):
     def __init__(self, model, cv, scoring):
         self.model = model
         self.param_grid = parameters[self.model.__class__.__name__]
         self.cv = cv
         self.scoring = scoring
 
-    @timeit
-    def grid_search(self, X_train: pd.DataFrame, y_train: pd.Series) -> list:
+    # @timeit
+    def optimizeHyperParams(self, X_train: pd.DataFrame, y_train: pd.Series) -> list:
         """Perform grid search to find the best hyperparameters for the model. Updates the model with the best hyperparameters.
 
         Args:
@@ -37,17 +38,41 @@ class Tune(object):
         grid_search.fit(X_train, y_train)
         self.model = grid_search.best_estimator_
         return [grid_search.best_params_, grid_search.best_score_]
+    
+    def trainModel(self, X: pd.DataFrame, y: pd.Series) -> None:
+        """Train the model
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--model', type=str, required=True)
-parser.add_argument('--cv', type=int, required=True)
-parser.add_argument('--scoring', type=str, required=True)
-args = parser.parse_args()
+        Args:
+            X (pd.DataFrame): training x values
+            y (pd.Series): training y values
+        """
+        self.model.fit(X, y)
+    
+    def evaluateModelMSE(self, X_test: pd.DataFrame, y_test: pd.Series) -> float:
+        """Evaluate the model on the test set
 
-if args.model in parameters.keys():
-    model = eval(args.model + '()')
-else:
-    print('Model not found')
-    raise SystemExit()
+        Args:
+            X_test (pd.DataFrame): test x values
+            y_test (pd.Series): test y values
 
-tuner = Tune(model, args.cv, args.scoring)
+        Returns:
+            float: score of the model
+        """
+        mse = mean_squared_error(y_test, self.model.predict(X_test))
+        print(f'Model Test MSE: {mse}')
+        return mse
+    
+    def saveModel(self, version: str) -> None:
+        """Save the model to a file
+
+        Args:
+            version (str): version of the model to save
+        """
+        complete_path = f'../models/{self.model.__class__.__name__}_{version}.joblib'
+        
+        if os.path.isfile(complete_path):
+            print(f'File already exists at {complete_path}')
+            self.saveModel(input('Enter a new version number: '))
+        else:
+            joblib.dump(self.model, complete_path)
+            print(f'Model saved to {complete_path}')

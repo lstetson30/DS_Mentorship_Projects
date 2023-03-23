@@ -2,6 +2,20 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from utils import printShape, timeit
 
+def separateFeaturesTarget(df: pd.DataFrame, target: str) -> tuple:
+    """Separates the features and target columns
+
+    Args:
+        df (pd.DataFrame): Dataframe containing the data
+        target (str): Name of the target column
+
+    Returns:
+        tuple: Features and target columns
+    """
+    X = df.drop(target, axis=1)
+    y = df[target]
+    return X, y
+
 @printShape
 def splitData(df: pd.DataFrame, target: str, test_size: float, random_state=0):
     """Splits the data into train and test sets

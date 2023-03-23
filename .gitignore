@@ -136,3 +136,13 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Test
+raw_data/*
+models/*
+results/*
+
+# Test exemptions
+!raw_data/.gitkeep
+!models/.gitkeep
+!results/.gitkeep
