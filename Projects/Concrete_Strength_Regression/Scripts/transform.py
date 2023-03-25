@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from utils import printShape, timeit
+from sklearn.preprocessing import StandardScaler
 
 def separateFeaturesTarget(df: pd.DataFrame, target: str) -> tuple:
     """Separates the features and target columns
@@ -85,3 +86,48 @@ def imputeMissing(*dfs, columns: list = None, strategy: str):
             if df[column].isnull().sum() > 0:
                 df[column].fillna(df[column].agg(strategy), inplace=True)
     return dfs
+
+def standardScaleDataframe(*dfs):
+    """Fits and transforms all columns of multiple dataframes using StandardScaler
+
+    Args:
+        *dfs (pd.DataFrame): Dataframes containing the data
+
+    Returns:
+        pd.DataFrame: Dataframe with scaled values
+    """
+    dfs_scaled = []
+    for df in dfs:
+        scaler = StandardScaler()
+        dfs_scaled.append(pd.DataFrame(scaler.fit_transform(df), columns=df.columns))
+    return dfs_scaled
+
+def standardScaleSeries(*series):
+    """Fits and transforms multiple pandas series using StandardScaler
+
+    Args:
+        *series (pd.Series): Series containing the data
+
+    Returns:
+        pd.Series: Series with scaled values
+    """
+    series_scaled = []
+    for s in series:
+        scaler = StandardScaler()
+        series_scaled.append(pd.Series(scaler.fit_transform(s.values.reshape(-1, 1)).flatten(), name=s.name))
+    return series_scaled
+
+#function to inverse standard scale on a series
+def inverseStandardScale(scaled_results, unscaled_series_ref: pd.Series):
+    """Inverse standard scale on pandas series using StandardScaler
+
+    Args:
+        series (pd.Series): Series containing the data
+
+    Returns:
+        pd.Series: Series with unscaled values
+    """
+    scaler = StandardScaler()
+    scaler.fit(unscaled_series_ref.values.reshape(-1, 1))
+    result = scaler.inverse_transform(scaled_results.reshape(-1, 1))
+    return result

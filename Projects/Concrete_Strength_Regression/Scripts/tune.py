@@ -21,8 +21,8 @@ class TuneTrain(object):
         self.cv = cv
         self.scoring = scoring
 
-    # @timeit
-    def optimizeHyperParams(self, X_train: pd.DataFrame, y_train: pd.Series) -> list:
+    @timeit
+    def optimizeHyperParams(self, X_train: pd.DataFrame, y_train: pd.Series):
         """Perform grid search to find the best hyperparameters for the model. Updates the model with the best hyperparameters.
 
         Args:
@@ -37,7 +37,7 @@ class TuneTrain(object):
             self.model, self.param_grid, cv=self.cv, scoring=self.scoring, n_jobs=N_JOBS)
         grid_search.fit(X_train, y_train)
         self.model = grid_search.best_estimator_
-        return [grid_search.best_params_, grid_search.best_score_]
+        print(f'CV Score ({self.scoring}): ', grid_search.best_score_)
     
     def trainModel(self, X: pd.DataFrame, y: pd.Series) -> None:
         """Train the model
