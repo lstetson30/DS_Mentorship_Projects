@@ -117,7 +117,6 @@ def standardScaleSeries(*series):
         series_scaled.append(pd.Series(scaler.fit_transform(s.values.reshape(-1, 1)).flatten(), name=s.name))
     return series_scaled
 
-#function to inverse standard scale on a series
 def inverseStandardScale(scaled_results, unscaled_series_ref: pd.Series):
     """Inverse standard scale on pandas series using StandardScaler
 
