@@ -1,10 +1,13 @@
 import numpy as np
 
 parameters = {
-    'LinearRegression': {'fit_intercept': [True, False]},
+    'LinearRegression':
+        {
+            'fit_intercept': [True, False]
+        },
     'Ridge': {'alpha': list(10**np.linspace(10, -2, 10)*0.5), 'fit_intercept': [True, False]},
     'Lasso': {'alpha': list(10**np.linspace(10, -2, 10)*0.5), 'fit_intercept': [True, False]},
-    'ElasticNet': {'alpha': list(10**np.linspace(10, -2, 10)*0.5), 
+    'ElasticNet': {'alpha': list(10**np.linspace(10, -2, 10)*0.5),
                    'l1_ratio': np.linspace(0, 1, 10), 'fit_intercept': [True, False]},
     'DecisionTreeRegressor': {'max_depth': range(2, 21, 2), 'min_samples_split': [2, 5, 10]},
     'RandomForestRegressor': {'n_estimators': [5, 10, 25, 50, 100, 150, 200, 300, 400, 500],
