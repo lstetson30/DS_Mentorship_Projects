@@ -3,7 +3,6 @@ import pandas as pd
 from utils import printShape
 from constants import DATAPATH, RAWDATAPATH
 
-
 @printShape
 def readData(filename: str) -> pd.DataFrame:
     """Reads the data from the csv file and returns a pandas dataframe
