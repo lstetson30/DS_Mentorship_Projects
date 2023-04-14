@@ -1,9 +1,10 @@
 from datetime import datetime
 import pandas as pd
 from utils import printShape
+from constants import DATAPATH, RAWDATAPATH
 
 @printShape
-def readData(filename: str):
+def readData(filename: str) -> pd.DataFrame:
     """Reads the data from the csv file and returns a pandas dataframe
 
     Args:
@@ -12,12 +13,12 @@ def readData(filename: str):
     Returns:
         pandas.DataFrame: Dataframe containing the data
     """
-    frame = pd.read_csv(filename)
+    frame = pd.read_csv(DATAPATH + filename)
     print("Raw Data:")
     print(frame.head())
     return frame
 
-def printSummaryStats(df: pd.DataFrame, columns: list = None):
+def printSummaryStats(df: pd.DataFrame, columns: list = None) -> None:
     """Prints the summary statistics of the columns of the dataframe
 
     Args:
@@ -29,7 +30,7 @@ def printSummaryStats(df: pd.DataFrame, columns: list = None):
         columns = df.columns
     print(df[columns].describe())
 
-def saveToRawData(df: pd.DataFrame, filename: str = None):
+def saveToRawData(df: pd.DataFrame, filename: str = None) -> None:
     """Saves the dataframe to the raw_data folder with a timestamp in the filename
 
     Args:
@@ -38,6 +39,6 @@ def saveToRawData(df: pd.DataFrame, filename: str = None):
     """
     name = filename if filename is not None else 'raw_data'
     ts = datetime.now().strftime('%Y%m%d_%H%M%S')
-    save_path = f"../data/raw_data/{name}_{ts}.csv"
+    save_path = f"{RAWDATAPATH}{name}_{ts}.csv"
     df.to_csv(save_path, index=False)
     print(f"Data saved to {save_path}")
