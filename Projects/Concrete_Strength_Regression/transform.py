@@ -11,14 +11,14 @@ def separateFeaturesTarget(df: pd.DataFrame, target: str) -> tuple:
         target (str): Name of the target column
 
     Returns:
-        tuple: Features and target columns
+        tuple: Features and target columns (X, y)
     """
     X = df.drop(target, axis=1)
     y = df[target]
     return X, y
 
 @printShape
-def splitData(df: pd.DataFrame, target: str, test_size: float, random_state=0):
+def splitData(df: pd.DataFrame, target: str, test_size: float, random_state=0) -> tuple:
     """Splits the data into train and test sets
 
     Args:
@@ -28,8 +28,7 @@ def splitData(df: pd.DataFrame, target: str, test_size: float, random_state=0):
         random_state (int): random state
 
     Returns:
-        pd.DataFrame: Train set
-        pd.DataFrame: Test set
+        tuple: Train and test sets (X_train, X_test, y_train, y_test)
     """
     X_train, X_test, y_train, y_test = train_test_split(df.drop(target, axis=1), df[target],
                                                         test_size=test_size, random_state=random_state)
@@ -39,7 +38,7 @@ def splitData(df: pd.DataFrame, target: str, test_size: float, random_state=0):
     return X_train, X_test, y_train, y_test
 
 
-def printMissingValues(df: pd.DataFrame, columns: list = None):
+def printMissingValues(df: pd.DataFrame, columns: list = None) -> None:
     """Prints the columns with missing values and how many missing values they have
 
     Args:
@@ -54,7 +53,7 @@ def printMissingValues(df: pd.DataFrame, columns: list = None):
             print(f'{column} has {df[column].isnull().sum()} missing values')
     print('Done')
 
-def printDataTypes(df: pd.DataFrame, columns: list = None):
+def printDataTypes(df: pd.DataFrame, columns: list = None) -> None:
     """Prints the data types of the columns
 
     Args:
@@ -68,7 +67,7 @@ def printDataTypes(df: pd.DataFrame, columns: list = None):
         print(f'{column}: {df[column].dtype}')
     print('Done')
 
-def imputeMissing(*dfs, columns: list = None, strategy: str):
+def imputeMissing(*dfs: pd.DataFrame, columns: list = None, strategy: str) -> tuple:
     """Imputes missing values in the columns of the dataframes
 
     Args:
@@ -77,7 +76,7 @@ def imputeMissing(*dfs, columns: list = None, strategy: str):
         strategy (str): Strategy to be used for imputation. Typically 'mean' or 'median'
 
     Returns:
-        pd.DataFrame: Dataframe with imputed values
+        tuple: Dataframes with imputed values
     """
     for df in dfs:
         if columns is None:
@@ -87,21 +86,24 @@ def imputeMissing(*dfs, columns: list = None, strategy: str):
                 df[column].fillna(df[column].agg(strategy), inplace=True)
     return dfs
 
-def standardScaleDataframe(*dfs):
-    """Fits and transforms all columns of multiple dataframes using StandardScaler
+def standardScaleDataframe(X_train: pd.DataFrame, *X_test: pd.DataFrame) -> tuple:
+    """Fits and transforms multiple pandas dataframes using StandardScaler
 
     Args:
-        *dfs (pd.DataFrame): Dataframes containing the data
+        X_train (pd.DataFrame): Dataframe containing the training data
+        X_test (pd.DataFrame): Dataframe containing the test data
 
     Returns:
-        pd.DataFrame: Dataframe with scaled values
+        tuple: Dataframes with scaled values
     """
     dfs_scaled = []
-    for df in dfs:
-        scaler = StandardScaler()
-        dfs_scaled.append(pd.DataFrame(scaler.fit_transform(df), columns=df.columns))
+    scaler = StandardScaler().fit(X_train)
+    dfs_scaled.append(pd.DataFrame(scaler.transform(X_train), columns=X_train.columns))
+    for df in X_test:
+        dfs_scaled.append(pd.DataFrame(scaler.transform(df), columns=df.columns))
     return dfs_scaled
 
+#I'm not sure if the next two functions are necessary
 def standardScaleSeries(*series):
     """Fits and transforms multiple pandas series using StandardScaler
 

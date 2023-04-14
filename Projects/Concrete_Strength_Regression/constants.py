@@ -1,10 +1,12 @@
 import numpy as np
+import argparse
 
-parameters = {
-    'LinearRegression':
-        {
-            'fit_intercept': [True, False]
-        },
+DATAPATH = 'Projects/Concrete_Strength_Regression/data/'
+RAWDATAPATH = 'Projects/Concrete_Strength_Regression/data/raw_data/'
+MODELSPATH = 'Projects/Concrete_Strength_Regression/models/'
+
+PARAMETERS = {
+    'LinearRegression': {'fit_intercept': [True, False]},
     'Ridge': {'alpha': list(10**np.linspace(10, -2, 10)*0.5), 'fit_intercept': [True, False]},
     'Lasso': {'alpha': list(10**np.linspace(10, -2, 10)*0.5), 'fit_intercept': [True, False]},
     'ElasticNet': {'alpha': list(10**np.linspace(10, -2, 10)*0.5),
@@ -39,3 +41,18 @@ parameters = {
                   'n_chains': [1]
                   }
 }
+
+parser = argparse.ArgumentParser(description='Run entire modeling pipeline from reading and\
+                                 transforming data to training and evaluating model')
+parser.add_argument('-r', '--reload', type=str, help='Reload model from joblib file')
+parser.add_argument('-m', '--model', type=str, help='Model to use from the following list:\
+                    LinearRegression, Ridge, Lasso, ElasticNet, DecisionTreeRegressor,\
+                    RandomForestRegressor, GradientBoostingRegressor, LGBMRegressor, SklearnModel')
+parser.add_argument('--printsummary', help='Print summary statistics of the data',\
+                    action='store_true')
+parser.add_argument('--testsize', type=float, help='Test size for train test split', default=0.2)
+parser.add_argument('-s', '--scale', help='Scale the data', action='store_true')
+parser.add_argument('--cv', type=int, help='Number of folds for cross validation', default=5)
+parser.add_argument('--scoring', type=str, help='Scoring metric for cross validation',\
+                    default='neg_mean_squared_error')
+parser.add_argument('--modelversion', type=str, help='Version of the model to save', required=True)
