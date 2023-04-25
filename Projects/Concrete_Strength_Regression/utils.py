@@ -1,6 +1,7 @@
 from time import time
 import pandas as pd
 
+
 def timeit(func):
     def wrapper(*args, **kwargs):
         start = time()
@@ -8,6 +9,7 @@ def timeit(func):
         end = time()
         print(f'Time taken to run {func.__name__}: {end-start} seconds')
     return wrapper
+
 
 def printShape(func):
     def wrapper(*args, **kwargs):
@@ -21,3 +23,16 @@ def printShape(func):
             print(df.shape)
         return df
     return wrapper
+
+
+def printSummaryStats(df: pd.DataFrame, columns: list = None):
+    """Prints the summary statistics of the columns of the dataframe
+
+    Args:
+        df (pd.DataFrame): Dataframe containing the data
+        columns (list, optional): List of columns for which the summary statistics are to be printed. Defaults to None.
+    """
+    print("Summary Statistics:")
+    if columns is None:
+        columns = df.columns
+    print(df[columns].describe())
