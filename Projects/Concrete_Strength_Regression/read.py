@@ -3,6 +3,7 @@ import pandas as pd
 from utils import printShape
 from constants import DATAPATH, RAWDATAPATH
 
+
 @printShape
 def readData(filename: str) -> pd.DataFrame:
     """Reads the data from the csv file and returns a pandas dataframe
@@ -18,17 +19,6 @@ def readData(filename: str) -> pd.DataFrame:
     print(frame.head())
     return frame
 
-def printSummaryStats(df: pd.DataFrame, columns: list = None) -> None:
-    """Prints the summary statistics of the columns of the dataframe
-
-    Args:
-        df (pd.DataFrame): Dataframe containing the data
-        columns (list, optional): List of columns for which the summary statistics are to be printed. Defaults to None.
-    """
-    print("Summary Statistics:")
-    if columns is None:
-        columns = df.columns
-    print(df[columns].describe())
 
 def saveToRawData(df: pd.DataFrame, filename: str = None) -> None:
     """Saves the dataframe to the raw_data folder with a timestamp in the filename
