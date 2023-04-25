@@ -1,0 +1,199 @@
+-- Schema SQL Query SQL ResultsEdit on DB Fiddle
+-- Example Query:
+-- SELECT
+-- 	runners.runner_id,
+--     runners.registration_date,
+-- 	COUNT(DISTINCT runner_orders.order_id) AS orders
+-- FROM pizza_runner.runners
+-- INNER JOIN pizza_runner.runner_orders
+-- 	ON runners.runner_id = runner_orders.runner_id
+-- WHERE runner_orders.cancellation IS NOT NULL
+-- GROUP BY
+-- 	runners.runner_id,
+--     runners.registration_date;
+
+/* --------------------
+	Update Tables with NULL issues
+   --------------------*/
+UPDATE pizza_runner.customer_orders
+SET exclusions = NULL 
+WHERE exclusions IN ('', 'null');
+
+UPDATE pizza_runner.customer_orders
+SET extras = NULL 
+WHERE extras IN ('', 'null');
+
+UPDATE pizza_runner.runner_orders
+SET cancellation = NULL 
+WHERE cancellation IN ('', 'null');
+
+UPDATE pizza_runner.runner_orders
+SET pickup_time = NULL 
+WHERE pickup_time IN ('', 'null');
+
+UPDATE pizza_runner.runner_orders
+SET distance = NULL 
+WHERE distance IN ('', 'null');
+
+UPDATE pizza_runner.runner_orders
+SET duration = NULL 
+WHERE duration IN ('', 'null');
+
+/* --------------------
+	Update runner_orders table with distance and time issues
+   --------------------*/
+   
+UPDATE pizza_runner.runner_orders
+SET distance = regexp_replace(distance, '[^0-9.]', '', 'g')::DECIMAL,
+	duration = regexp_replace(duration, '[^0-9]', '', 'g')::INT,
+    pickup_time = CAST(pickup_time AS TIMESTAMP);
+ 
+
+/* --------------------
+   Pizza Metrics Questions
+   --------------------*/
+
+-- Q1.1: How many pizzas were ordered?
+SELECT COUNT(*) AS total_pizzas_ordered
+FROM pizza_runner.customer_orders;
+
+-- Q1.2: How many unique customer orders were made?
+SELECT COUNT(DISTINCT order_id) AS unique_orders
+FROM pizza_runner.customer_orders;
+
+-- Q1.3: How many successful orders were delivered by each runner?
+SELECT
+	runner_id,
+	COUNT(order_id) AS successful_orders
+FROM pizza_runner.runner_orders
+WHERE cancellation IS NULL
+GROUP BY runner_id;
+
+-- Q1.4: How many of each type of pizza was delivered?
+SELECT
+	pn.pizza_name AS type_of_pizza,
+    COUNT(*) AS number_delivered
+FROM pizza_runner.customer_orders
+JOIN pizza_runner.pizza_names AS pn
+	USING (pizza_id)
+JOIN pizza_runner.runner_orders AS ro
+	USING (order_id)
+WHERE ro.cancellation IS NULL
+GROUP BY type_of_pizza;
+
+-- Q1.5: How many Vegetarian and Meatlovers were ordered by each customer?
+SELECT
+	pn.pizza_name AS type_of_pizza,
+    COUNT(*) AS number_ordered
+FROM pizza_runner.customer_orders
+JOIN pizza_runner.pizza_names AS pn
+	USING (pizza_id)
+GROUP BY type_of_pizza;
+
+-- Q1.6: What was the maximum number of pizzas delivered in a single order?
+SELECT MAX(pizzas_in_order) AS max_pizzas_in_order
+FROM (
+  SELECT COUNT(*) AS pizzas_in_order
+  FROM pizza_runner.customer_orders AS co
+  JOIN pizza_runner.runner_orders AS ro
+      USING (order_id)
+  WHERE ro.cancellation IS NULL
+  GROUP BY co.order_id
+) AS pizzas_delivered_by_order;
+
+-- Q1.7: For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+SELECT 
+	co.customer_id,
+    SUM(CASE WHEN co.exclusions IS NULL AND co.extras IS NULL 
+      THEN 1 ELSE 0 END) AS unaltered_pizzas,
+     SUM(CASE WHEN co.exclusions IS NULL AND co.extras IS NULL 
+      THEN 0 ELSE 1 END) AS altered_pizzas
+FROM pizza_runner.customer_orders AS co
+JOIN pizza_runner.runner_orders AS ro
+	USING (order_id)
+WHERE ro.cancellation IS NULL
+GROUP BY co.customer_id
+ORDER BY co.customer_id;
+
+-- Q1.8: How many pizzas were delivered that had both exclusions and extras?
+SELECT 
+    SUM(CASE WHEN co.exclusions IS NOT NULL AND co.extras IS NOT NULL 
+      THEN 1 ELSE 0 END) AS both_exclusions_and_extras
+FROM pizza_runner.customer_orders AS co
+JOIN pizza_runner.runner_orders AS ro
+	USING (order_id)
+WHERE ro.cancellation IS NULL;
+
+-- Q1.9: What was the total volume of pizzas ordered for each hour of the day?
+WITH orders_with_hour AS (
+  SELECT *,
+  	EXTRACT(HOUR FROM order_time) AS order_hour
+  FROM pizza_runner.customer_orders
+)
+SELECT 
+	order_hour,
+    COUNT(*) AS pizzas_ordered
+FROM orders_with_hour
+GROUP BY order_hour
+ORDER BY order_hour;
+
+-- Q1.10: What was the volume of orders for each day of the week?
+WITH orders_with_dow AS (
+  SELECT *,
+  	EXTRACT(dow FROM order_time) AS order_day_of_week
+  	-- 0=Sunday to 6=Saturday
+  FROM pizza_runner.customer_orders
+)
+SELECT 
+	CASE 
+    	WHEN order_day_of_week=0 THEN 'Sunday'
+        WHEN order_day_of_week=1 THEN 'Monday'
+        WHEN order_day_of_week=2 THEN 'Tuesday'
+        WHEN order_day_of_week=3 THEN 'Wednesday'
+        WHEN order_day_of_week=4 THEN 'Thursday'
+        WHEN order_day_of_week=5 THEN 'Friday'
+        WHEN order_day_of_week=6 THEN 'Saturday'
+    END AS day_of_week,
+    COUNT(*) AS pizzas_ordered
+FROM orders_with_dow
+GROUP BY order_day_of_week
+ORDER BY order_day_of_week;
+
+/* --------------------
+	Runner & Customer Experience Questions
+   --------------------*/
+
+-- Q2.1: How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)
+SELECT
+	CEIL(EXTRACT(DOY FROM registration_date) / 7.0) AS week,
+    COUNT(*) AS runners_signed_up
+FROM pizza_runner.runners
+GROUP BY week
+ORDER BY week;
+
+-- Q2.2: What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?
+SELECT
+    DISTINCT co.order_id,
+    ro.runner_id,
+    (
+     DATE_PART('day', ro.pickup_time::timestamp - co.order_time::timestamp) * 24 + 
+     DATE_PART('hour', ro.pickup_time::timestamp - co.order_time::timestamp) * 60 +
+     DATE_PART('minute', ro.pickup_time::timestamp - co.order_time::timestamp)	 
+     ) AS min_to_arrive
+FROM pizza_runner.customer_orders AS co
+JOIN pizza_runner.runner_orders AS ro
+    USING (order_id)
+
+-- Q2.3: Is there any relationship between the number of pizzas and how long the order takes to prepare?
+
+
+-- Q2.4: What was the average distance travelled for each customer?
+
+
+-- Q2.5: What was the difference between the longest and shortest delivery times for all orders?
+
+
+-- Q2.6: What was the average speed for each runner for each delivery and do you notice any trend for these values?
+
+
+-- Q2.7: What is the successful delivery percentage for each runner?
