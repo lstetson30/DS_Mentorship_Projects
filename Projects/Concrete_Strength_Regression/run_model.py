@@ -1,25 +1,21 @@
-import read, transform
+import read, transform, utils
 from tune import TuneTrain
-from constants import PARAMETERS, MODELSPATH, parser
+from constants import *
 import joblib
 import os
 
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from lightgbm import LGBMRegressor
 from bartpy.sklearnmodel import SklearnModel
 
-args = parser.parse_args()
+args = model_parser.parse_args()
 
 if args.reload:
-    try:
-        model = joblib.load(MODELSPATH + args.reload)
-    except FileNotFoundError:
-        print('Model file not found')
-        raise SystemExit()
+    model = utils.loadJoblibModel(args.reload)
 else:
     if args.model in PARAMETERS.keys():
        model = eval(args.model + '()')
@@ -28,12 +24,10 @@ else:
         raise SystemExit()
 
 # Read the data
-# file_in = input("Enter the name of the file (in data folder)to be read: ").strip()
-file_in = 'Concrete_Data_Yeh.csv'
-df = read.readData(file_in)
+df = read.readData(DATAFILE)
 
 if args.printsummary:
-    read.printSummaryStats(df)
+    utils.printSummaryStats(df)
 
 read.saveToRawData(df)
 
@@ -42,24 +36,17 @@ X_train, X_test, y_train, y_test = transform.splitData(df, 'csMPa', args.testsiz
 
 #Scale the data with standard scaler
 if args.scale:
-    X_train_unscaled, X_test_unscaled = X_train.copy(), X_test.copy()
     X_train, X_test = transform.standardScaleDataframe(X_train, X_test)
 
 #Tune the model to find the best Hyperparameters
-tuner = TuneTrain(model, args.cv, args.scoring)
+tuner = TuneTrain(model, args.cv, args.cvscoring, args.scale)
 tuner.optimizeHyperParams(X_train, y_train)
 
 #Train the model on the training set
 tuner.trainModel(X_train, y_train)
 
 #Evaluate the model on the test set
-test_mse = tuner.evaluateModelMSE(X_test, y_test)
-# if args.scale:
-#     eval_model = tuner.model
-#     y_predicted = eval_model.predict(X_test)
-#     y_predicted = transform.inverseStandardScale(y_predicted, y_train_unscaled)
-#     test_mse = mean_squared_error(y_test_unscaled, y_predicted)
-#     print(f'Model Test MSE Unscaled: {test_mse}')
+test_mse = tuner.evaluateModel(X_test, y_test, args.testscoring)
     
 #Train the model on the entire dataset and save it
 X, y = transform.separateFeaturesTarget(df, 'csMPa')

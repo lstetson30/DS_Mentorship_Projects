@@ -148,4 +148,4 @@ results/
 !results/.gitkeep
 
 # Reference files
-Projects/framework.txt
+*/framework.txt

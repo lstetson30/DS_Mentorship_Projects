@@ -1,6 +1,7 @@
 from time import time
 import pandas as pd
-
+import joblib
+from constants import MODELSPATH
 
 def timeit(func):
     def wrapper(*args, **kwargs):
@@ -36,3 +37,21 @@ def printSummaryStats(df: pd.DataFrame, columns: list = None):
     if columns is None:
         columns = df.columns
     print(df[columns].describe())
+    
+def loadJoblibModel(filename: str) -> object:
+    """Loads the model from the specified path
+
+    Args:
+        filename (str): Name of the file to load excluding the extension
+
+    Returns:
+        model: The loaded model
+    """
+    
+    try:
+        model = joblib.load(MODELSPATH + filename + '.joblib')
+    except FileNotFoundError:
+        print('Model file not found')
+        raise SystemExit()
+    
+    return model

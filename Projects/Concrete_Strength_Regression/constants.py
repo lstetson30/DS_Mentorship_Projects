@@ -1,9 +1,18 @@
 import numpy as np
 import argparse
 
+from sklearn.metrics import mean_squared_error
+
+CV = 5
+CV_SCORING_FUNCTION = 'neg_mean_squared_error'
+TESTSIZE = 0.2
+TEST_SCORING_FUNCTION = mean_squared_error
+
+DATAFILE = 'Concrete_Data_Yeh.csv'
 DATAPATH = 'Projects/Concrete_Strength_Regression/data/'
 RAWDATAPATH = 'Projects/Concrete_Strength_Regression/data/raw_data/'
 MODELSPATH = 'Projects/Concrete_Strength_Regression/models/'
+RESULTSPATH = 'Projects/Concrete_Strength_Regression/results/'
 
 PARAMETERS = {
     'LinearRegression': {'fit_intercept': [True, False]},
@@ -42,17 +51,36 @@ PARAMETERS = {
                   }
 }
 
-parser = argparse.ArgumentParser(description='Run entire modeling pipeline from reading and\
+model_parser = argparse.ArgumentParser(description='Run entire modeling pipeline from reading and\
                                  transforming data to training and evaluating model')
-parser.add_argument('-r', '--reload', type=str, help='Reload model from joblib file')
-parser.add_argument('-m', '--model', type=str, help='Model to use from the following list:\
+model_parser.add_argument('-r', '--reload', type=str, help='Reload model from joblib file')
+model_parser.add_argument('-m', '--model', type=str, help='Model to use from the following list:\
                     LinearRegression, Ridge, Lasso, ElasticNet, DecisionTreeRegressor,\
                     RandomForestRegressor, GradientBoostingRegressor, LGBMRegressor, SklearnModel')
-parser.add_argument('--printsummary', help='Print summary statistics of the data',\
-                    action='store_true')
-parser.add_argument('--testsize', type=float, help='Test size for train test split', default=0.2)
-parser.add_argument('-s', '--scale', help='Scale the data', action='store_true')
-parser.add_argument('--cv', type=int, help='Number of folds for cross validation', default=5)
-parser.add_argument('--scoring', type=str, help='Scoring metric for cross validation',\
-                    default='neg_mean_squared_error')
-parser.add_argument('--modelversion', type=str, help='Version of the model to save', required=True)
+model_parser.add_argument('--printsummary', help='Print summary statistics of the data',
+                          action='store_true')
+model_parser.add_argument('--testsize', type=float, help='Test size for train test split',
+                          default=TESTSIZE)
+model_parser.add_argument('-s', '--scale', help='Scale the data', action='store_true')
+model_parser.add_argument('--cv', type=int, help='Number of folds for cross validation', default=CV)
+model_parser.add_argument('--cvscoring', type=str, help='Scoring metric for cross validation',
+                          default=CV_SCORING_FUNCTION)
+model_parser.add_argument('--testscoring', type=str, help='Scoring metric for test set',
+                          default=TEST_SCORING_FUNCTION)
+model_parser.add_argument('--modelversion', type=str, help='Version of the model to save', 
+                          required=True)
+
+prediction_parser = argparse.ArgumentParser(description='Predict using a trained model')
+prediction_parser.add_argument('-m', '--modelfile', type=str, 
+                               help='Model to import from the models folder including version, but excluding file extension', required=True)
+prediction_parser.add_argument('-d', '--datafile', type=str, 
+                               help='Data to import from the data folder excluding file extension', required=True)
+
+model_params_parser = argparse.ArgumentParser(description='Print model parameters')
+
+model_params_parser.add_argument('-m', '--model', type=str, 
+                                 help='Model to use from the following list: \
+                                 LinearRegression, Ridge, Lasso, ElasticNet, \
+                                 DecisionTreeRegressor, RandomForestRegressor, \
+                                 GradientBoostingRegressor, LGBMRegressor, SklearnModel')
+model_params_parser.add_argument('-v', '--version', type=str, help='Version of model to use')
