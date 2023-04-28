@@ -144,7 +144,7 @@ results/
 
 # Test exemptions
 !raw_data/.gitkeep
-!models/test_mse.txt
+!models/test_score.csv
 !results/.gitkeep
 
 # Reference files
