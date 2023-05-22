@@ -1,6 +1,7 @@
 import read, transform
+from transform import splitData, standardScaleDataframe, separateFeaturesTarget
 from tune import TuneTrain
-from constants import PARAMETERS, MODELSPATH, parser
+import constants
 import joblib
 import os
 
@@ -15,22 +16,19 @@ from bartpy.sklearnmodel import SklearnModel
 
 def run_model(model, file_name):
 
-    # Read the data
-    # file_in = input("Enter the name of the file (in data folder)to be read: ").strip()
     df = read.readData(file_name)
+    read.saveToRawData(df)
 
     if args.printsummary:
         read.printSummaryStats(df)
 
-    read.saveToRawData(df)
-
     #Transform the data
-    X_train, X_test, y_train, y_test = transform.splitData(df, 'csMPa', args.testsize)
+    X_train, X_test, y_train, y_test = splitData(df, 'csMPa', args.testsize)
 
     #Scale the data with standard scaler
     if args.scale:
         X_train_unscaled, X_test_unscaled = X_train.copy(), X_test.copy()
-        X_train, X_test = transform.standardScaleDataframe(X_train, X_test)
+        X_train, X_test = standardScaleDataframe(X_train, X_test)
 
     #Tune the model to find the best Hyperparameters
     tuner = TuneTrain(model, args.cv, args.scoring)
@@ -40,6 +38,7 @@ def run_model(model, file_name):
     tuner.trainModel(X_train, y_train)
 
     #Evaluate the model on the test set
+    train_mse = tuner.evaluateModelMSE(X_train, y_train)
     test_mse = tuner.evaluateModelMSE(X_test, y_test)
     # if args.scale:
     #     eval_model = tuner.model
@@ -49,7 +48,7 @@ def run_model(model, file_name):
     #     print(f'Model Test MSE Unscaled: {test_mse}')
 
     #Train the model on the entire dataset and save it
-    X, y = transform.separateFeaturesTarget(df, 'csMPa')
+    X, y = separateFeaturesTarget(df, 'csMPa')
     tuner.trainModel(X, y)
     tuner.saveModel(args.modelversion)
 
