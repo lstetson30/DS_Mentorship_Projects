@@ -5,13 +5,16 @@ DATAPATH = 'Projects/Concrete_Strength_Regression/data/'
 RAWDATAPATH = 'Projects/Concrete_Strength_Regression/data/raw_data/'
 MODELSPATH = 'Projects/Concrete_Strength_Regression/models/'
 
+DATA_FILE = 'Concrete_Data_Yeh.csv'
+
 PARAMETERS = {
-    'LinearRegression': {'fit_intercept': [True, False]},
-    'Ridge': {'alpha': list(10**np.linspace(10, -2, 10)*0.5), 'fit_intercept': [True, False]},
-    'Lasso': {'alpha': list(10**np.linspace(10, -2, 10)*0.5), 'fit_intercept': [True, False]},
+    'LinearRegression': {},
+    'Ridge': {'alpha': list(10**np.linspace(10, -2, 10)*0.5)},
+    'Lasso': {'alpha': list(10**np.linspace(10, -2, 10)*0.5)},
     'ElasticNet': {'alpha': list(10**np.linspace(10, -2, 10)*0.5),
-                   'l1_ratio': np.linspace(0, 1, 10), 'fit_intercept': [True, False]},
-    'DecisionTreeRegressor': {'max_depth': range(2, 21, 2), 'min_samples_split': [2, 5, 10]},
+                   'l1_ratio': np.linspace(0, 1, 10)},
+    'DecisionTreeRegressor': {'max_depth': range(2, 21, 2),
+                              'min_samples_split': [2, 5, 10]},
     'RandomForestRegressor': {'n_estimators': [5, 10, 25, 50, 100, 150, 200, 300, 400, 500],
                               'max_depth': range(6, 21, 2),
                               'min_samples_split': [2, 5, 10],

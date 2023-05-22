@@ -39,7 +39,7 @@ class TuneTrain(object):
         grid_search.fit(X_train, y_train)
         self.model = grid_search.best_estimator_
         print(f'CV Score ({self.scoring}): ', grid_search.best_score_)
-    
+
     def trainModel(self, X: pd.DataFrame, y: pd.Series) -> None:
         """Train the model
 
@@ -48,17 +48,17 @@ class TuneTrain(object):
             y (pd.Series): training y values
         """
         self.model.fit(X, y)
-    
-    def evaluateModelMSE(self, X_test: pd.DataFrame, y_test: pd.Series) -> None:
-        """Evaluate the model on the test set
+
+    def evaluateModelMSE(self, X: pd.DataFrame, y: pd.Series) -> None:
+        """Evaluate the model
 
         Args:
-            X_test (pd.DataFrame): test x values
-            y_test (pd.Series): test y values
+            X (pd.DataFrame): x values
+            y (pd.Series): y values
         """
-        self.mse = mean_squared_error(y_test, self.model.predict(X_test))
-        print(f'Model Test MSE: {self.mse}')
-    
+        self.mse = mean_squared_error(y, self.model.predict(X))
+        print(f'Model MSE: {self.mse}')
+
     def saveModel(self, version: str) -> None:
         """Save the model to a file. Saves the model's MSE as well.
 
@@ -66,7 +66,7 @@ class TuneTrain(object):
             version (str): version of the model to save
         """
         complete_path = f'{MODELSPATH}{self.model.__class__.__name__}_{version}.joblib'
-        
+
         if os.path.isfile(complete_path):
             print(f'File already exists at {complete_path}')
             self.saveModel(input('Enter a new version number: '))
@@ -82,4 +82,4 @@ class TuneTrain(object):
                     with open(f'{MODELSPATH}test_mse.txt', 'w') as file:
                         file.write(f'{self.model.__class__.__name__}_{version}: {self.mse}\n')
             else:
-                print('Test MSE not available. Not saving to mse.txt')
+                print('MSE not available. Not saving to mse.txt')

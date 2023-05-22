@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from utils import printShape, timeit
 from sklearn.preprocessing import StandardScaler
 
+
 def separateFeaturesTarget(df: pd.DataFrame, target: str) -> tuple:
     """Separates the features and target columns
 
@@ -16,6 +17,7 @@ def separateFeaturesTarget(df: pd.DataFrame, target: str) -> tuple:
     X = df.drop(target, axis=1)
     y = df[target]
     return X, y
+
 
 @printShape
 def splitData(df: pd.DataFrame, target: str, test_size: float, random_state=0) -> tuple:
@@ -34,7 +36,7 @@ def splitData(df: pd.DataFrame, target: str, test_size: float, random_state=0) -
                                                         test_size=test_size, random_state=random_state)
     # print(f'Size of Train: X-{X_train.shape}, Y-{y_train.shape}')
     # print(f'Size of Test: X-{X_test.shape}, Y-{y_test.shape}')
-    
+
     return X_train, X_test, y_train, y_test
 
 
@@ -53,6 +55,7 @@ def printMissingValues(df: pd.DataFrame, columns: list = None) -> None:
             print(f'{column} has {df[column].isnull().sum()} missing values')
     print('Done')
 
+
 def printDataTypes(df: pd.DataFrame, columns: list = None) -> None:
     """Prints the data types of the columns
 
@@ -66,6 +69,7 @@ def printDataTypes(df: pd.DataFrame, columns: list = None) -> None:
     for column in columns:
         print(f'{column}: {df[column].dtype}')
     print('Done')
+
 
 def imputeMissing(*dfs: pd.DataFrame, columns: list = None, strategy: str) -> tuple:
     """Imputes missing values in the columns of the dataframes
@@ -86,6 +90,7 @@ def imputeMissing(*dfs: pd.DataFrame, columns: list = None, strategy: str) -> tu
                 df[column].fillna(df[column].agg(strategy), inplace=True)
     return dfs
 
+
 def standardScaleDataframe(X_train: pd.DataFrame, *X_test: pd.DataFrame) -> tuple:
     """Fits and transforms multiple pandas dataframes using StandardScaler
 
@@ -103,6 +108,7 @@ def standardScaleDataframe(X_train: pd.DataFrame, *X_test: pd.DataFrame) -> tupl
         dfs_scaled.append(pd.DataFrame(scaler.transform(df), columns=df.columns))
     return dfs_scaled
 
+
 #I'm not sure if the next two functions are necessary
 def standardScaleSeries(*series):
     """Fits and transforms multiple pandas series using StandardScaler
@@ -118,6 +124,7 @@ def standardScaleSeries(*series):
         scaler = StandardScaler()
         series_scaled.append(pd.Series(scaler.fit_transform(s.values.reshape(-1, 1)).flatten(), name=s.name))
     return series_scaled
+
 
 def inverseStandardScale(scaled_results, unscaled_series_ref: pd.Series):
     """Inverse standard scale on pandas series using StandardScaler
