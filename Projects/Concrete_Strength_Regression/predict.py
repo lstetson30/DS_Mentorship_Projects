@@ -9,25 +9,25 @@ from constants import prediction_parser
 
 args = prediction_parser.parse_args()
 
-#Import the model
+# Import the model
 model = loadJoblibModel(args.modelfile)
 
-#Import the data
+# Import the data
 try:
-    df = read.readData(args.datafile + '.csv')
+    df = read.readData(args.datafile + ".csv")
 except FileNotFoundError:
-    print('Data file not found')
+    print("Data file not found")
     raise SystemExit()
 
-#Drop the target variable (if it exists)
-X = df.drop(['csMPa'], axis=1, errors='ignore')
+# Drop the target variable (if it exists)
+X = df.drop(["csMPa"], axis=1, errors="ignore")
 
-#Make Predictions
+# Make Predictions
 predictions = model.predict(X)
-df['Predictions'] = predictions
+df["Predictions"] = predictions
 
-#Save the predictions
-ts = datetime.now().strftime('%Y%m%d_%H%M%S')
-save_path = f'{RESULTSPATH}predictions_{args.modelfile}_{ts}'
+# Save the predictions
+ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+save_path = f"{RESULTSPATH}predictions_{args.modelfile}_{ts}.csv"
 df.to_csv(save_path, index=False)
 print(f"Results saved to {save_path}")
