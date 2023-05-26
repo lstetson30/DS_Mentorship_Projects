@@ -2,6 +2,17 @@
 
 In this project, I will perform everything from data wranging to regression modeling evaluation for data on concrete composition and strength.  The data comes from Kaggle user MAAJDL (https://www.kaggle.com/datasets/maajdl/yeh-concret-data).  The "About Dataset" section below contains the provided datacard.  
 
+The following files can be run:  
+* run_model.py to initialize, tune, train, and save a model  
+* print_model_params.py to print a specific model's parameters  
+* predict.py to use a model to predict  
+
+Data and models are stored in the following locations:  
+* data: data from Kaggle and model params from notebooks  
+* data/raw_data: data used to tune and train the models (all the same data in this case)  
+* models: models tuned and trained in run_model.py  
+* results: results from predict.py  
+
 ---
 
 ## About Dataset

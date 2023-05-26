@@ -27,8 +27,8 @@ def saveToRawData(df: pd.DataFrame, filename: str = None) -> None:
         df (pd.DataFrame): Dataframe to be saved
         filename (str, optional): Name of the file. Defaults to None.
     """
-    name = filename if filename is not None else 'raw_data'
-    ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+    name = filename if filename else "raw_data"
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     save_path = f"{RAWDATAPATH}{name}_{ts}.csv"
     df.to_csv(save_path, index=False)
     print(f"Data saved to {save_path}")

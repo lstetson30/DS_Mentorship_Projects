@@ -1,39 +1,33 @@
 import os
-import argparse
-import joblib
 import read
 from datetime import datetime
 
-parser = argparse.ArgumentParser(description='Predict using a trained model')
-parser.add_argument('-m', '--modelpath', type=str, help='Model to import from the models folder', required=True)
-parser.add_argument('-d', '--datapath', type=str, help='Data to import from the data folder', required=True)
+from utils import loadJoblibModel
+from constants import DATAPATH, RESULTSPATH, DATAFILE
 
-args = parser.parse_args()
+from constants import prediction_parser
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+args = prediction_parser.parse_args()
 
-#Import the model
+# Import the model
+model = loadJoblibModel(args.modelfile)
+
+# Import the data
 try:
-    model = joblib.load(f'../models/{args.modelpath}')
+    df = read.readData(args.datafile + ".csv")
 except FileNotFoundError:
-    print('Model file not found')
+    print("Data file not found")
     raise SystemExit()
 
-#Import the data
-try:
-    df = read.readData(f"../data/{args.datapath}")
-except FileNotFoundError:
-    print('Data file not found')
-    raise SystemExit()
+# Drop the target variable (if it exists)
+X = df.drop(["csMPa"], axis=1, errors="ignore")
 
-X = df.drop(['csMPa'], axis=1, errors='ignore')
-
-#Make Predictions
+# Make Predictions
 predictions = model.predict(X)
-df['Predictions'] = predictions
+df["Predictions"] = predictions
 
-#Save the predictions
-ts = datetime.now().strftime('%Y%m%d_%H%M%S')
-save_path = f'../results/predictions_{ts}'
+# Save the predictions
+ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+save_path = f"{RESULTSPATH}predictions_{args.modelfile}_{ts}.csv"
 df.to_csv(save_path, index=False)
 print(f"Results saved to {save_path}")

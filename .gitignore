@@ -144,8 +144,8 @@ results/
 
 # Test exemptions
 !raw_data/.gitkeep
-!models/test_mse.txt
+!models/.gitkeep
 !results/.gitkeep
 
 # Reference files
-Projects/Concrete_Strength_Regression/Scripts/framework.txt
+*/framework.txt
