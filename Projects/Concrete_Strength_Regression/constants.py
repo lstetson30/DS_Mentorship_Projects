@@ -8,6 +8,7 @@ CV = 5
 CV_SCORING_FUNCTION = "neg_mean_squared_error"
 TESTSIZE = 0.2
 TEST_SCORING_FUNCTION = mean_squared_error
+N_JOBS = -1
 
 DATAFILE = "Concrete_Data_Yeh.csv"
 DATAPATH = "Projects/Concrete_Strength_Regression/data/"

@@ -1,5 +1,5 @@
 import pandas as pd
-from constants import PARAMETERS, MODELSPATH
+import constants
 from utils import timeit
 import joblib
 import os.path
@@ -13,11 +13,10 @@ from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from lightgbm import LGBMRegressor
 from bartpy.sklearnmodel import SklearnModel
 
-N_JOBS = -1
-
 
 class TuneTrain(object):
-    """Class to tune and train a model. Also evaluates the model on the training and test sets and saves the model to a file.
+    """Class to tune and train a model. Also evaluates the model on the training and
+    test sets and saves the model to a file.
 
     Args:
         model (sklearn model): model to tune and train
@@ -36,15 +35,17 @@ class TuneTrain(object):
         scaled_data (bool): whether the data has been scaled or not
 
     Methods:
-        optimizeHyperParams: perform grid search to find the best hyperparameters for the model
+        optimizeHyperParams: perform grid search to find the best hyperparameters for
+            the model
         trainModel: train the model
         evaluateModel: evaluate the model on the training or test set
-        saveModel: save the model to a joblib file and saves the model scores to a csv file
+        saveModel: save the model to a joblib file and saves the model scores to a
+            csv file
     """
 
     def __init__(self, model, cv, cv_scoring, scaled_data):
         self.model = model
-        self.param_grid = PARAMETERS[self.model.__class__.__name__]
+        self.param_grid = constants.PARAMETERS[self.model.__class__.__name__]
         self.cv = cv
         self.cv_scoring = cv_scoring
         self.scoring_metric = None
@@ -54,7 +55,8 @@ class TuneTrain(object):
 
     @timeit
     def optimizeHyperParams(self, X_train: pd.DataFrame, y_train: pd.Series) -> None:
-        """Perform grid search to find the best hyperparameters for the model. Updates the model with the best hyperparameters.
+        """Perform grid search to find the best hyperparameters for the model.
+        Updates the model with the best hyperparameters.
 
         Args:
             X_train (pd.DataFrame): training x values
@@ -69,7 +71,7 @@ class TuneTrain(object):
             self.param_grid,
             cv=self.cv,
             scoring=self.cv_scoring,
-            n_jobs=N_JOBS,
+            n_jobs=constants.N_JOBS,
         )
         grid_search.fit(X_train, y_train)
         self.model = grid_search.best_estimator_
@@ -93,7 +95,8 @@ class TuneTrain(object):
             X (pd.DataFrame): x values
             y (pd.Series): y values
             test_func (function): scoring function to use
-            test_set (bool): whether X and y are from a test set (True) or training set (False)
+            test_set (bool): whether X and y are from a test set (True) or
+                training set (False)
         """
         self.scoring_metric = test_func.__name__
         if test_set:
@@ -109,7 +112,9 @@ class TuneTrain(object):
         Args:
             version (str): version of the model to save
         """
-        complete_path = f"{MODELSPATH}{self.model.__class__.__name__}_{version}.joblib"
+        complete_path = (
+            f"{constants.MODELSPATH}{self.model.__class__.__name__}_{version}.joblib"
+        )
 
         if os.path.isfile(complete_path):
             print(f"File already exists at {complete_path}")
@@ -129,9 +134,11 @@ class TuneTrain(object):
 
             headers = score_dict.keys()
 
-            eval_score_file_exists = os.path.isfile(f"{MODELSPATH}eval_score.csv")
+            eval_score_file_exists = os.path.isfile(
+                f"{constants.MODELSPATH}eval_score.csv"
+            )
 
-            with open(f"{MODELSPATH}eval_score.csv", "a") as file:
+            with open(f"{constants.MODELSPATH}eval_score.csv", "a") as file:
                 writer = DictWriter(file, fieldnames=headers)
 
                 if not eval_score_file_exists:

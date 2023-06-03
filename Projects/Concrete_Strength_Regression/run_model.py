@@ -1,17 +1,10 @@
-import read, utils
-from transform import splitData, standardScaleDataframe, separateFeaturesTarget
+import read
+import utils
+from transform import standardScaleDataframe
 from tune import TuneTrain
 import constants
-import joblib
-import os
 
-from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from lightgbm import LGBMRegressor
-from bartpy.sklearnmodel import SklearnModel
+from sklearn.model_selection import train_test_split
 
 
 def run_model(model, file_name):
@@ -22,7 +15,9 @@ def run_model(model, file_name):
         utils.printSummaryStats(df)
 
     # Transform the data
-    X_train, X_test, y_train, y_test = splitData(df, "csMPa", args.testsize)
+    X_train, X_test, y_train, y_test = train_test_split(
+        df.drop("csMPa", axis=1), df["csMPa"], test_size=args.testsize
+    )
 
     # Scale the data with standard scaler
     if args.scale:
@@ -40,7 +35,8 @@ def run_model(model, file_name):
     tuner.evaluateModel(X_test, y_test, args.testscoring, test_set=True)
 
     # Train the model on the entire dataset and save it
-    X, y = separateFeaturesTarget(df, "csMPa")
+    X = df.drop("csMPa", axis=1)
+    y = df["csMPa"]
     tuner.trainModel(X, y)
     tuner.saveModel(args.modelversion)
 
