@@ -129,12 +129,12 @@ class TuneTrain(object):
 
             headers = score_dict.keys()
 
-            test_score_file_exists = os.path.isfile(f"{MODELSPATH}test_score.csv")
+            eval_score_file_exists = os.path.isfile(f"{MODELSPATH}eval_score.csv")
 
-            with open(f"{MODELSPATH}test_score.csv", "a") as file:
+            with open(f"{MODELSPATH}eval_score.csv", "a") as file:
                 writer = DictWriter(file, fieldnames=headers)
 
-                if not test_score_file_exists:
+                if not eval_score_file_exists:
                     writer.writeheader()
 
                 writer.writerow(score_dict)
