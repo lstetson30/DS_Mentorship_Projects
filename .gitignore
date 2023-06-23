@@ -141,11 +141,13 @@ cython_debug/
 raw_data/
 models/
 results/
+runs/
 
 # Test exemptions
 !raw_data/.gitkeep
 !models/.gitkeep
 !results/.gitkeep
+!runs/.gitkeep
 
 # Reference files
 */framework.txt
