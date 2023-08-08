@@ -1,9 +1,8 @@
-import os
 import read
 from datetime import datetime
 
 from utils import loadJoblibModel
-from constants import DATAPATH, RESULTSPATH, DATAFILE
+import constants
 
 from constants import prediction_parser
 
@@ -28,6 +27,6 @@ df["Predictions"] = predictions
 
 # Save the predictions
 ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-save_path = f"{RESULTSPATH}predictions_{args.modelfile}_{ts}.csv"
+save_path = f"{constants.RESULTSPATH}predictions_{args.modelfile}_{ts}.csv"
 df.to_csv(save_path, index=False)
 print(f"Results saved to {save_path}")

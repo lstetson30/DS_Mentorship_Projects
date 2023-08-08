@@ -38,12 +38,44 @@ def printSummaryStats(df: pd.DataFrame, columns: list = None):
 
     Args:
         df (pd.DataFrame): Dataframe containing the data
-        columns (list, optional): List of columns for which the summary statistics are to be printed. Defaults to None.
+        columns (list, optional): List of columns for which the summary
+            statistics are to be printed. Defaults to None.
     """
     print("Summary Statistics:")
     if columns is None:
         columns = df.columns
     print(df[columns].describe())
+
+
+def printMissingValues(df: pd.DataFrame, columns: list = None) -> None:
+    """Prints the columns with missing values and how many missing values they have
+
+    Args:
+        df (pd.DataFrame): Dataframe containing the data
+        columns (list, optional): List of columns to be checked. Defaults to None.
+    """
+    print("Missing Values:")
+    if columns is None:
+        columns = df.columns
+    for column in columns:
+        if df[column].isnull().sum() > 0:
+            print(f"{column} has {df[column].isnull().sum()} missing values")
+    print("Done")
+
+
+def printDataTypes(df: pd.DataFrame, columns: list = None) -> None:
+    """Prints the data types of the columns
+
+    Args:
+        df (pd.DataFrame): Dataframe containing the data
+        columns (list, optional): List of columns to be checked. Defaults to None.
+    """
+    print("Data types:")
+    if columns is None:
+        columns = df.columns
+    for column in columns:
+        print(f"{column}: {df[column].dtype}")
+    print("Done")
 
 
 def loadJoblibModel(filename: str) -> object:
